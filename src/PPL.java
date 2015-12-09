@@ -1,5 +1,4 @@
 
-
 /**
  * Problema de Programação Linear
  *
@@ -19,8 +18,8 @@ public class PPL {
     private boolean maximizacao;                //é um problema de maximização?
     private int qtdeRestricoes;                 //quantidade de restrições deste problema
     private int qtdeVariaveis;                  //quantidade de variáveis deste problema
-    private double[] funcaoObjetivo;            //função objetivo (somente coeficientes)
-    private double[][] restricoes;              //restricoes (somente coeficientes) + lado direito
+    private Double[] funcaoObjetivo;            //função objetivo (somente coeficientes)
+    private Double[][] restricoes;              //restricoes (somente coeficientes) + lado direito
     private int[] sinalRestricoes;              //indica o sinal de cada restrição
     // -2 -1 0 1 2 para < <= = >= >, respectivamente
     private int[] naoNegatividadeMenorIgual;    //indica os coeficientes de não negatividade <=
@@ -41,7 +40,7 @@ public class PPL {
      * @param naoNegatividadeMaiorIgual
      * @param naoNegatividadeReais
      */
-    public PPL(boolean maximizacao, int qtdeRestricoes, int qtdeVariaveis, double[] funcaoObjetivo, double[][] restricoes, int[] sinalRestricoes, int[] naoNegatividadeMenorIgual, int[] naoNegatividadeMaiorIgual, int[] naoNegatividadeReais) {
+    public PPL(boolean maximizacao, int qtdeRestricoes, int qtdeVariaveis, Double[] funcaoObjetivo, Double[][] restricoes, int[] sinalRestricoes, int[] naoNegatividadeMenorIgual, int[] naoNegatividadeMaiorIgual, int[] naoNegatividadeReais) {
         this.maximizacao = maximizacao;
         this.qtdeRestricoes = qtdeRestricoes;
         this.qtdeVariaveis = qtdeVariaveis;
@@ -104,7 +103,7 @@ public class PPL {
                     System.out.print("  " + restricoes[i][j] + "X" + (j + 1));
                 }
             }
-            switch (sinalRestricoes[i]) {
+            switch (getSinalRestricoes()[i]) {
                 case -1:
                     System.out.print(" <= " + restricoes[i][j]);
                     break;
@@ -152,8 +151,8 @@ public class PPL {
     }
 
     private void insertRestricoes(String[] restricoes) {
-        this.restricoes = new double[qtdeRestricoes][qtdeVariaveis + 1];
-        this.sinalRestricoes = new int[qtdeRestricoes];
+        this.restricoes = new Double[qtdeRestricoes][qtdeVariaveis + 1];
+        this.setSinalRestricoes(new int[qtdeRestricoes]);
         String atual;
         String numero;
         char c;
@@ -177,7 +176,7 @@ public class PPL {
                     if (numero.charAt(0) == 'x') {                      //se houver um x...   
                         j = Integer.parseInt(numero.charAt(1) + "") - 1;//vefica qual variavel e modifica o contador j
                         if (coeficiente == COEFICIENTE_INVALIDO) {      //não há coeficiente explicito
-                            this.restricoes[i][j] = 1;
+                            this.restricoes[i][j] = 1.0;
                         } else {                                        //há coeficiente explicito
                             this.restricoes[i][j] = coeficiente;
                         }
@@ -185,13 +184,13 @@ public class PPL {
                     } else if (numero.charAt(0) == '<' || numero.charAt(0) == '>' || numero.charAt(0) == '=') {
                         switch (numero.charAt(0)) {
                             case '<':                                   //<=
-                                this.sinalRestricoes[i] = this.MENOR_IGUAL;
+                                this.getSinalRestricoes()[i] = this.MENOR_IGUAL;
                                 break;
                             case '>':
-                                this.sinalRestricoes[i] = this.MAIOR_IGUAL;           //>=
+                                this.getSinalRestricoes()[i] = this.MAIOR_IGUAL;           //>=
                                 break;
                             case '=':
-                                this.sinalRestricoes[i] = this.IGUAL;            //=
+                                this.getSinalRestricoes()[i] = this.IGUAL;            //=
                                 break;
                         }
                         numero = "";
@@ -208,7 +207,7 @@ public class PPL {
                     } else if (numero.charAt(0) == '-' || numero.charAt(0) == '+') {
                         if (numero.charAt(1) == 'x') {                      //entrada do tipo -xi
                             j = Integer.parseInt(numero.charAt(2) + "") - 1;
-                            this.restricoes[i][j] = -1;
+                            this.restricoes[i][j] = -1.0;
                         } else {                                             //é um número negativo
                             coeficiente = Double.parseDouble(numero);
                         }
@@ -255,7 +254,7 @@ public class PPL {
     }
 
     private void insertFuncaoObjetivo(String funcaoObjetivo) {
-        this.funcaoObjetivo = new double[qtdeVariaveis];
+        this.funcaoObjetivo = new Double[qtdeVariaveis];
         String numero;
         char c;
         int indiceString = 0;
@@ -284,8 +283,8 @@ public class PPL {
         //Variáveis necessárias para contruir um novo objetivo
         int qtdeRestricoesDual = this.qtdeVariaveis;
         int qtdeVariaveisDual = this.qtdeRestricoes;
-        double[] funcaoObjetivoDual = new double[this.qtdeRestricoes];
-        double[][] restricoesDual = new double[this.qtdeVariaveis][this.qtdeRestricoes + 1];
+        Double[] funcaoObjetivoDual = new Double[this.qtdeRestricoes];
+        Double[][] restricoesDual = new Double[this.qtdeVariaveis][this.qtdeRestricoes + 1];
         int[] sinalRestricoesDual = new int[this.qtdeVariaveis];
         int[] naoNegatividadeMenorIgualDual = new int[this.qtdeRestricoes];
         int[] naoNegatividadeMaiorIgualDual = new int[this.qtdeRestricoes];
@@ -333,7 +332,7 @@ public class PPL {
         //add nao negatividade
         for (int i = 0; i < this.qtdeRestricoes; i++) {
             if (!isMaximizacao()) {                  //PRIMAL DE MAXIMIZACAO
-                switch (this.sinalRestricoes[i]) {
+                switch (this.getSinalRestricoes()[i]) {
                     case MENOR_IGUAL:
                         naoNegatividadeMenorIgualDual[i] = 1;
                         break;
@@ -345,7 +344,7 @@ public class PPL {
                         break;
                 }
             } else {                                  //PRIMAL DE MINIMIZACAO
-                switch (this.sinalRestricoes[i]) {
+                switch (this.getSinalRestricoes()[i]) {
                     case MENOR_IGUAL:
                         naoNegatividadeMaiorIgualDual[i] = 1;
                         break;
@@ -383,11 +382,7 @@ public class PPL {
      * change the state of maximizacao
      */
     public void changeMaximizacao() {
-        if (isMaximizacao()) {
-            this.maximizacao = false;
-        } else {
-            this.maximizacao = true;
-        }
+        this.maximizacao = !isMaximizacao();
     }
 
     /**
@@ -421,28 +416,28 @@ public class PPL {
     /**
      * @return the funcaoObjetivo
      */
-    public double[] getFuncaoObjetivo() {
+    public Double[] getFuncaoObjetivo() {
         return funcaoObjetivo;
     }
 
     /**
      * @param funcaoObjetivo the funcaoObjetivo to set
      */
-    public void setFuncaoObjetivo(double[] funcaoObjetivo) {
+    public void setFuncaoObjetivo(Double[] funcaoObjetivo) {
         this.funcaoObjetivo = funcaoObjetivo;
     }
 
     /**
      * @return the restricoes
      */
-    public double[][] getRestricoes() {
+    public Double[][] getRestricoes() {
         return restricoes;
     }
 
     /**
      * @param restricoes the restricoes to set
      */
-    public void setRestricoes(double[][] restricoes) {
+    public void setRestricoes(Double[][] restricoes) {
         this.restricoes = restricoes;
     }
 
@@ -493,6 +488,42 @@ public class PPL {
      */
     public int getNUMERO_MAXIMO_ITERACOES() {
         return NUMERO_MAXIMO_ITERACOES;
+    }
+
+    /**
+     * @return the sinalRestricoes
+     */
+    public int[] getSinalRestricoes() {
+        return sinalRestricoes;
+    }
+
+    /**
+     * @param sinalRestricoes the sinalRestricoes to set
+     */
+    public void setSinalRestricoes(int[] sinalRestricoes) {
+        this.sinalRestricoes = sinalRestricoes;
+    }
+
+    public void addVariavelArtificial(double var, int restricao) {
+        Double[] auxFuncaoObjetivo = this.funcaoObjetivo;
+        Double[][] auxRestricoes = this.restricoes;
+        //Adicionando na funcao Objetivo
+        this.funcaoObjetivo = new Double[++qtdeVariaveis];
+        for (int i = 0; i < qtdeVariaveis; i++) {
+            this.funcaoObjetivo[i] = auxFuncaoObjetivo[i];
+        }
+        this.funcaoObjetivo[qtdeVariaveis - 1] = var;
+        //Adicionando nas restricoes
+        this.restricoes = new Double[qtdeRestricoes][qtdeVariaveis];
+        for (int linha = 0; linha < qtdeRestricoes; linha++) {
+            for (int coluna = 0; coluna < qtdeVariaveis; coluna++) {
+                this.restricoes[linha][coluna] = auxRestricoes[linha][coluna];
+            }
+        }
+        for (int i = 0; i < qtdeRestricoes; i++) {
+            this.restricoes[i][qtdeVariaveis - 1] = 0.0;
+        }
+
     }
 
 }
