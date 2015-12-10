@@ -9,11 +9,11 @@ public class PPL {
     private final double COEFICIENTE_INVALIDO = Double.MAX_VALUE;
     private final int NUMERO_MAXIMO_ITERACOES;
 
-    private final int MAIOR = 2;
-    private final int MAIOR_IGUAL = 1;
-    private final int IGUAL = 0;
-    private final int MENOR_IGUAL = -1;
-    private final int MENOR = -2;
+    public static final int MAIOR = 2;
+    public static final int MAIOR_IGUAL = 1;
+    public static final int IGUAL = 0;
+    public static final int MENOR_IGUAL = -1;
+    public static final int MENOR = -2;
 
     private boolean maximizacao;                //é um problema de maximização?
     private int qtdeRestricoes;                 //quantidade de restrições deste problema
@@ -40,7 +40,15 @@ public class PPL {
      * @param naoNegatividadeMaiorIgual
      * @param naoNegatividadeReais
      */
+<<<<<<< HEAD
     public PPL(boolean maximizacao, int qtdeRestricoes, int qtdeVariaveis, Double[] funcaoObjetivo, Double[][] restricoes, int[] sinalRestricoes, int[] naoNegatividadeMenorIgual, int[] naoNegatividadeMaiorIgual, int[] naoNegatividadeReais) {
+=======
+    public PPL(boolean maximizacao, int qtdeRestricoes,
+            int qtdeVariaveis, double[] funcaoObjetivo,
+            double[][] restricoes, int[] sinalRestricoes,
+            int[] naoNegatividadeMenorIgual, int[] naoNegatividadeMaiorIgual,
+            int[] naoNegatividadeReais) {
+>>>>>>> cf44c4742eed2574ce012ec78951ab7d806c4985
         this.maximizacao = maximizacao;
         this.qtdeRestricoes = qtdeRestricoes;
         this.qtdeVariaveis = qtdeVariaveis;
@@ -64,7 +72,8 @@ public class PPL {
      * @param restricoes
      * @param naoNegatividade
      */
-    public PPL(String tipo, int qtdeRestricoes, int qtdeVariaveis, String funcaoObjetivo, String[] restricoes, String[] naoNegatividade) {
+    public PPL(String tipo, int qtdeRestricoes, int qtdeVariaveis, 
+            String funcaoObjetivo, String[] restricoes, String[] naoNegatividade) {
         if (tipo.equalsIgnoreCase("max")) {     //Se for Max, set True.. se não, continue false
             this.maximizacao = true;
         }
@@ -104,13 +113,17 @@ public class PPL {
                 }
             }
             switch (getSinalRestricoes()[i]) {
+<<<<<<< HEAD
                 case -1:
+=======
+                case PPL.MENOR_IGUAL:
+>>>>>>> cf44c4742eed2574ce012ec78951ab7d806c4985
                     System.out.print(" <= " + restricoes[i][j]);
                     break;
-                case 0:
+                case PPL.MAIOR_IGUAL:
                     System.out.print(" >= " + restricoes[i][j]);
                     break;
-                case 1:
+                case PPL.IGUAL:
                     System.out.print(" = " + restricoes[i][j]);
                     break;
             }
@@ -151,7 +164,11 @@ public class PPL {
     }
 
     private void insertRestricoes(String[] restricoes) {
+<<<<<<< HEAD
         this.restricoes = new Double[qtdeRestricoes][qtdeVariaveis + 1];
+=======
+        this.restricoes = new double[qtdeRestricoes][qtdeVariaveis + 1];
+>>>>>>> cf44c4742eed2574ce012ec78951ab7d806c4985
         this.setSinalRestricoes(new int[qtdeRestricoes]);
         String atual;
         String numero;
@@ -184,6 +201,7 @@ public class PPL {
                     } else if (numero.charAt(0) == '<' || numero.charAt(0) == '>' || numero.charAt(0) == '=') {
                         switch (numero.charAt(0)) {
                             case '<':                                   //<=
+<<<<<<< HEAD
                                 this.getSinalRestricoes()[i] = this.MENOR_IGUAL;
                                 break;
                             case '>':
@@ -191,6 +209,15 @@ public class PPL {
                                 break;
                             case '=':
                                 this.getSinalRestricoes()[i] = this.IGUAL;            //=
+=======
+                                this.getSinalRestricoes()[i] = this.getMENOR_IGUAL();
+                                break;
+                            case '>':
+                                this.getSinalRestricoes()[i] = this.getMAIOR_IGUAL();           //>=
+                                break;
+                            case '=':
+                                this.getSinalRestricoes()[i] = this.getIGUAL();            //=
+>>>>>>> cf44c4742eed2574ce012ec78951ab7d806c4985
                                 break;
                         }
                         numero = "";
@@ -309,23 +336,23 @@ public class PPL {
         for (int i = 0; i < this.qtdeVariaveis; i++) {
             if (!isMaximizacao()) {                  //PRIMAL DE MAXIMIZACAO
                 if (this.naoNegatividadeMenorIgual[i] == 1) {
-                    sinalRestricoesDual[i] = this.MAIOR_IGUAL;
+                    sinalRestricoesDual[i] = this.getMAIOR_IGUAL();
                 }
                 if (this.naoNegatividadeMaiorIgual[i] == 1) {
-                    sinalRestricoesDual[i] = this.MENOR_IGUAL;
+                    sinalRestricoesDual[i] = this.getMENOR_IGUAL();
                 }
                 if (this.naoNegatividadeReais[i] == 1) {
-                    sinalRestricoesDual[i] = this.IGUAL;
+                    sinalRestricoesDual[i] = this.getIGUAL();
                 }
             } else {                                  //PRIMAL DE MINIMIZACAO
                 if (this.naoNegatividadeMenorIgual[i] == 1) {
-                    sinalRestricoesDual[i] = this.MENOR_IGUAL;
+                    sinalRestricoesDual[i] = this.getMENOR_IGUAL();
                 }
                 if (this.naoNegatividadeMaiorIgual[i] == 1) {
-                    sinalRestricoesDual[i] = this.MAIOR_IGUAL;
+                    sinalRestricoesDual[i] = this.getMAIOR_IGUAL();
                 }
                 if (this.naoNegatividadeReais[i] == 1) {
-                    sinalRestricoesDual[i] = this.IGUAL;
+                    sinalRestricoesDual[i] = this.getIGUAL();
                 }
             }
         }
@@ -333,13 +360,17 @@ public class PPL {
         for (int i = 0; i < this.qtdeRestricoes; i++) {
             if (!isMaximizacao()) {                  //PRIMAL DE MAXIMIZACAO
                 switch (this.getSinalRestricoes()[i]) {
+<<<<<<< HEAD
                     case MENOR_IGUAL:
+=======
+                    case PPL.MENOR_IGUAL:
+>>>>>>> cf44c4742eed2574ce012ec78951ab7d806c4985
                         naoNegatividadeMenorIgualDual[i] = 1;
                         break;
-                    case MAIOR_IGUAL:
+                    case PPL.MAIOR_IGUAL:
                         naoNegatividadeMaiorIgualDual[i] = 1;
                         break;
-                    case IGUAL:
+                    case PPL.IGUAL:
                         naoNegatividadeReaisDual[i] = 1;
                         break;
                 }
@@ -490,20 +521,27 @@ public class PPL {
         return NUMERO_MAXIMO_ITERACOES;
     }
 
+<<<<<<< HEAD
     /**
      * @return the sinalRestricoes
      */
+=======
+>>>>>>> cf44c4742eed2574ce012ec78951ab7d806c4985
     public int[] getSinalRestricoes() {
         return sinalRestricoes;
     }
 
+<<<<<<< HEAD
     /**
      * @param sinalRestricoes the sinalRestricoes to set
      */
+=======
+>>>>>>> cf44c4742eed2574ce012ec78951ab7d806c4985
     public void setSinalRestricoes(int[] sinalRestricoes) {
         this.sinalRestricoes = sinalRestricoes;
     }
 
+<<<<<<< HEAD
     public void addVariavelArtificial(double var, int restricao) {
         Double[] auxFuncaoObjetivo = this.funcaoObjetivo;
         Double[][] auxRestricoes = this.restricoes;
@@ -524,6 +562,26 @@ public class PPL {
             this.restricoes[i][qtdeVariaveis - 1] = 0.0;
         }
 
+=======
+    public int getMAIOR() {
+        return MAIOR;
+    }
+
+    public int getMAIOR_IGUAL() {
+        return MAIOR_IGUAL;
+    }
+
+    public int getIGUAL() {
+        return IGUAL;
+    }
+
+    public int getMENOR_IGUAL() {
+        return MENOR_IGUAL;
+    }
+
+    public int getMENOR() {
+        return MENOR;
+>>>>>>> cf44c4742eed2574ce012ec78951ab7d806c4985
     }
 
 }

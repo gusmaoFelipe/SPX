@@ -74,7 +74,8 @@ public class Solver {
         instancia = new PPL(tipo, qtdeRestricoes, qtdeVariaveis, funcaoObjetivo, restricoes, naoNegatividade);
         SimplexSolver simplexSolver = new SimplexSolver(instancia);
         simplexSolver.getProblema().print();
-        
+        simplexSolver.insertVariaveisArtificiais();
+        simplexSolver.getProblema().print();
 //        System.out.println("\nRealizando DUAL\n");
 //        instancia = instancia.gerarDual();
 //        instancia.print();
