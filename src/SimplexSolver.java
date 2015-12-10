@@ -14,42 +14,11 @@ public class SimplexSolver {
 
     public SimplexSolver(PPL problema) {
         this.problema = problema;
-<<<<<<< HEAD
         nIteracoes = 0;
         if (problema.getQtdeRestricoes() > problema.getQtdeVariaveis() * FATOR_TOLERANCIA) {
             this.problema = problema.gerarDual();
         }
         this.simplex = this.problema;
-
-    }
-
-    private void insertVariaveisArtificiais() {
-
-        //Se houver restrição <= , precisa de M
-        //Verificando se há restrições do tipo <=
-        boolean hasRestricaoMenorIgual = false;
-        for (int restricao = 0; restricao < this.problema.getQtdeRestricoes(); restricao++) {
-            if (problema.getSinalRestricoes()[restricao] == -1) {
-                hasRestricaoMenorIgual = true;
-                break;
-            }
-        }
-        if (hasRestricaoMenorIgual) {
-            for (int restricao = 0; restricao < problema.getQtdeRestricoes(); restricao++) {
-                switch (problema.getSinalRestricoes()[restricao]) {
-                    case -1:                                                //<=
-                        problema.addVariavelArtificial(-1, restricao);
-                        break;
-                    case 1:                                                 //>=
-                        problema.addVariavelArtificial(1, restricao);
-                        break;
-                    case 0:                                                 //=
-                        break;
-                }
-=======
-        /*if (problema.getQtdeRestricoes() > problema.getQtdeVariaveis() * FATOR_TOLERANCIA) {
-         this.problema = problema.gerarDual();
-         }*/
 
     }
 
@@ -70,7 +39,7 @@ public class SimplexSolver {
                 case PPL.MENOR_IGUAL:
                     int novaQtdRestricoes = problema.getQtdeRestricoes();
                     int novaQtdVariaveis = problema.getQtdeVariaveis() + 1;
-                    double[][] novasRestricoes = new double[novaQtdRestricoes][novaQtdVariaveis + 1];
+                    Double[][] novasRestricoes = new Double[novaQtdRestricoes][novaQtdVariaveis + 1];
                     for (int k = 0; k < novaQtdRestricoes; k++) {
                         for (int l = 0; l < novaQtdVariaveis - 1; l++) {
                             //Mantém as restrições
@@ -78,17 +47,17 @@ public class SimplexSolver {
                             novasRestricoes[k][l] = problema.getRestricoes()[k][l];
                         }
                         //Seta o valor da variável de folga
-                        novasRestricoes[i][novaQtdVariaveis-1]=1;
+                        novasRestricoes[i][novaQtdVariaveis - 1] = 1.0;
                         //Move o lado direito para a direita
                         novasRestricoes[k][novaQtdVariaveis] = problema.getRestricoes()[k][problema.getQtdeVariaveis()];
                     }
                     problema.getSinalRestricoes()[i] = PPL.IGUAL;
                     //Copia a função objetivo + nova variável de foga com coeficiente 0
-                    double[] novaFuncaoObjetivo = new double[novaQtdVariaveis];
+                    Double[] novaFuncaoObjetivo = new Double[novaQtdVariaveis];
                     for (int k = 0; k < novaQtdVariaveis - 1; k++) {
                         novaFuncaoObjetivo[k] = problema.getFuncaoObjetivo()[k];
                     }
-                    novaFuncaoObjetivo[novaQtdVariaveis - 1] = 0;
+                    novaFuncaoObjetivo[novaQtdVariaveis - 1] = 0.0;
                     //Copia a restrição de não negatividade
                     int[] novaNaoNegatividadeMenorIgual = new int[novaQtdVariaveis];
                     for (int k = 0; k < novaQtdVariaveis - 1; k++) {
@@ -117,7 +86,6 @@ public class SimplexSolver {
                     break;
                 case PPL.IGUAL:
                     break;
->>>>>>> cf44c4742eed2574ce012ec78951ab7d806c4985
             }
         }
     }
