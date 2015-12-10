@@ -1,4 +1,7 @@
 
+import sun.java2d.pipe.SpanShapeRenderer;
+
+
 /**
  * Problema de Programação Linear
  *
@@ -18,8 +21,8 @@ public class PPL {
     private boolean maximizacao;                //é um problema de maximização?
     private int qtdeRestricoes;                 //quantidade de restrições deste problema
     private int qtdeVariaveis;                  //quantidade de variáveis deste problema
-    private Double[] funcaoObjetivo;            //função objetivo (somente coeficientes)
-    private Double[][] restricoes;              //restricoes (somente coeficientes) + lado direito
+    private double[] funcaoObjetivo;            //função objetivo (somente coeficientes)
+    private double[][] restricoes;              //restricoes (somente coeficientes) + lado direito
     private int[] sinalRestricoes;              //indica o sinal de cada restrição
     // -2 -1 0 1 2 para < <= = >= >, respectivamente
     private int[] naoNegatividadeMenorIgual;    //indica os coeficientes de não negatividade <=
@@ -41,8 +44,8 @@ public class PPL {
      * @param naoNegatividadeReais
      */
     public PPL(boolean maximizacao, int qtdeRestricoes,
-            int qtdeVariaveis, Double[] funcaoObjetivo,
-            Double[][] restricoes, int[] sinalRestricoes,
+            int qtdeVariaveis, double[] funcaoObjetivo,
+            double[][] restricoes, int[] sinalRestricoes,
             int[] naoNegatividadeMenorIgual, int[] naoNegatividadeMaiorIgual,
             int[] naoNegatividadeReais) {
         this.maximizacao = maximizacao;
@@ -156,8 +159,7 @@ public class PPL {
     }
 
     private void insertRestricoes(String[] restricoes) {
-        this.restricoes = new Double[qtdeRestricoes][qtdeVariaveis + 1];
-        this.restricoes = new Double[qtdeRestricoes][qtdeVariaveis + 1];
+        this.restricoes = new double[qtdeRestricoes][qtdeVariaveis + 1];
         this.setSinalRestricoes(new int[qtdeRestricoes]);
         String atual;
         String numero;
@@ -210,10 +212,14 @@ public class PPL {
                             c = atual.charAt(indiceString++);
                         }
                         this.restricoes[i][j] = Double.parseDouble(numero);
+                        coeficiente = COEFICIENTE_INVALIDO;
                     } else if (numero.charAt(0) == '-' || numero.charAt(0) == '+') {
-                        if (numero.charAt(1) == 'x') {                      //entrada do tipo -xi
+                        if (numero.charAt(0) == '-' && numero.charAt(1) == 'x') {   //entrada do tipo -xi
                             j = Integer.parseInt(numero.charAt(2) + "") - 1;
                             this.restricoes[i][j] = -1.0;
+                        } else if (numero.charAt(0) == '+' && numero.charAt(1) == 'x') {
+                            j = Integer.parseInt(numero.charAt(2) + "") - 1;
+                            this.restricoes[i][j] = 1.0;
                         } else {                                             //é um número negativo
                             coeficiente = Double.parseDouble(numero);
                         }
@@ -260,7 +266,7 @@ public class PPL {
     }
 
     private void insertFuncaoObjetivo(String funcaoObjetivo) {
-        this.funcaoObjetivo = new Double[qtdeVariaveis];
+        this.funcaoObjetivo = new double[qtdeVariaveis];
         String numero;
         char c;
         int indiceString = 0;
@@ -289,8 +295,8 @@ public class PPL {
         //Variáveis necessárias para contruir um novo objetivo
         int qtdeRestricoesDual = this.qtdeVariaveis;
         int qtdeVariaveisDual = this.qtdeRestricoes;
-        Double[] funcaoObjetivoDual = new Double[this.qtdeRestricoes];
-        Double[][] restricoesDual = new Double[this.qtdeVariaveis][this.qtdeRestricoes + 1];
+        double[] funcaoObjetivoDual = new double[this.qtdeRestricoes];
+        double[][] restricoesDual = new double[this.qtdeVariaveis][this.qtdeRestricoes + 1];
         int[] sinalRestricoesDual = new int[this.qtdeVariaveis];
         int[] naoNegatividadeMenorIgualDual = new int[this.qtdeRestricoes];
         int[] naoNegatividadeMaiorIgualDual = new int[this.qtdeRestricoes];
@@ -422,28 +428,28 @@ public class PPL {
     /**
      * @return the funcaoObjetivo
      */
-    public Double[] getFuncaoObjetivo() {
+    public double[] getFuncaoObjetivo() {
         return funcaoObjetivo;
     }
 
     /**
      * @param funcaoObjetivo the funcaoObjetivo to set
      */
-    public void setFuncaoObjetivo(Double[] funcaoObjetivo) {
+    public void setFuncaoObjetivo(double[] funcaoObjetivo) {
         this.funcaoObjetivo = funcaoObjetivo;
     }
 
     /**
      * @return the restricoes
      */
-    public Double[][] getRestricoes() {
+    public double[][] getRestricoes() {
         return restricoes;
     }
 
     /**
      * @param restricoes the restricoes to set
      */
-    public void setRestricoes(Double[][] restricoes) {
+    public void setRestricoes(double[][] restricoes) {
         this.restricoes = restricoes;
     }
 
@@ -511,16 +517,19 @@ public class PPL {
     }
 
     public void addVariavelArtificial(double var, int restricao) {
-        Double[] auxFuncaoObjetivo = this.funcaoObjetivo;
-        Double[][] auxRestricoes = this.restricoes;
+        double[] auxFuncaoObjetivo = this.funcaoObjetivo;
+        double[][] auxRestricoes = this.restricoes;
+        int[] auxMaiorIgual = this.naoNegatividadeMaiorIgual;
+        int[] auxMenorIgual = this.naoNegatividadeMenorIgual;
+        int[] auxReal = this.naoNegatividadeReais;
         //Adicionando na funcao Objetivo
-        this.funcaoObjetivo = new Double[++qtdeVariaveis];
-        for (int i = 0; i < qtdeVariaveis; i++) {
+        this.funcaoObjetivo = new double[++qtdeVariaveis];
+        for (int i = 0; i < qtdeVariaveis - 1; i++) {
             this.funcaoObjetivo[i] = auxFuncaoObjetivo[i];
         }
-        this.funcaoObjetivo[qtdeVariaveis - 1] = var;
+        this.funcaoObjetivo[qtdeVariaveis - 1] = 0.0;
         //Adicionando nas restricoes
-        this.restricoes = new Double[qtdeRestricoes][qtdeVariaveis];
+        this.restricoes = new double[qtdeRestricoes][qtdeVariaveis + 1];
         for (int linha = 0; linha < qtdeRestricoes; linha++) {
             for (int coluna = 0; coluna < qtdeVariaveis; coluna++) {
                 this.restricoes[linha][coluna] = auxRestricoes[linha][coluna];
@@ -529,5 +538,20 @@ public class PPL {
         for (int i = 0; i < qtdeRestricoes; i++) {
             this.restricoes[i][qtdeVariaveis - 1] = 0.0;
         }
+        this.restricoes[restricao][qtdeVariaveis - 1] = 1.0;
+        //Adicionando sinalRestricoes
+        this.sinalRestricoes[restricao] = IGUAL;
+        //Adicionando nao negatividade
+        this.naoNegatividadeMaiorIgual = new int[qtdeVariaveis];
+        this.naoNegatividadeMenorIgual = new int[qtdeVariaveis];
+        this.naoNegatividadeReais = new int[qtdeVariaveis];
+        for (int i = 0; i < qtdeVariaveis - 1; i++) {
+            this.naoNegatividadeMaiorIgual[i] = auxMaiorIgual[i];
+            this.naoNegatividadeMenorIgual[i] = auxMenorIgual[i];
+            this.naoNegatividadeReais[i] = auxReal[i];
+        }
+        this.naoNegatividadeMaiorIgual[qtdeVariaveis - 1] = 1;
+        this.naoNegatividadeMenorIgual[qtdeVariaveis - 1] = 0;
+        this.naoNegatividadeReais[qtdeVariaveis - 1] = 0;
     }
 }
