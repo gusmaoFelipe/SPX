@@ -4,7 +4,7 @@
  */
 public class SimplexNormal {
  
-    double[][] Matriz = {{-696, -399, 100, 0, 0, 0, -900},
+    double[][] matriz = {{-696, -399, 100, 0, 0, 0, -900},
                           {1,    2,    0,  1, 0, 0,   4},
                           {3,    1,    0,  0, 1, 0,   3},
                           {4,    3,   -1,  0, 0, 1,   6}};
@@ -17,8 +17,8 @@ public class SimplexNormal {
         double menorValor = 0;
         int posicao = 0;
         for (int i = 0; i < (colunas-1); i++) {
-            if (Matriz[0][i] < menorValor) {
-                menorValor = Matriz[0][i];
+            if (matriz[0][i] < menorValor) {
+                menorValor = matriz[0][i];
                 posicao = i;
             }
   
@@ -34,8 +34,8 @@ public class SimplexNormal {
         double valorMenor = -1, valor = 0;
         int posicao = -1;
         for (int i = 1; i < linhas; i++) {
-            if (Matriz[i][entraBase] > 0 && Matriz[i][colunas - 1] > 0) {
-                valor = Matriz[i][colunas - 1] / Matriz[i][entraBase];
+            if (matriz[i][entraBase] > 0 && matriz[i][colunas - 1] > 0) {
+                valor = matriz[i][colunas - 1] / matriz[i][entraBase];
                 if (valorMenor == -1 || valor < valorMenor) {
                     valorMenor = valor;
                     posicao = i;
@@ -47,21 +47,21 @@ public class SimplexNormal {
 
     private void calcularMatriz(int entraBase, int saiBase) {
     
-        double pivo = Matriz[saiBase][entraBase];
+        double pivo = matriz[saiBase][entraBase];
 
         // dividir linha da Matriz do pivo pelo pivo
         if (pivo != 1) {
             for (int i = 0; i < colunas; i++) {
-                Matriz[saiBase][i] = Matriz[saiBase][i] / pivo;
+                matriz[saiBase][i] = matriz[saiBase][i] / pivo;
             }
         }
 
         // Aplicar Gauss-Jordan
         for (int i = 0; i < linhas; i++) {
-          double   valor = Matriz[i][entraBase] * (-1);
+          double   valor = matriz[i][entraBase] * (-1);
             for (int j = 0; j < colunas; j++) {
                 if (saiBase != i) {
-                    Matriz[i][j] = Matriz[i][j] + (Matriz[saiBase][j] * valor);
+                    matriz[i][j] = matriz[i][j] + (matriz[saiBase][j] * valor);
                 }
             }    
         }
@@ -71,7 +71,7 @@ public class SimplexNormal {
     public void printarMatriz() {
         for (int i = 0; i < linhas; i++) {
             for (int j = 0; j < colunas; j++) {
-                System.out.printf("%.2f ",Matriz[i][j]);
+                System.out.printf("%.2f ",matriz[i][j]);
             }
             System.out.println("");
         }

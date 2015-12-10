@@ -8,8 +8,8 @@ import Jama.Matrix;
 public class SimplexRevisado {
 
     private final double FATOR_TOLERANCIA = 1.2;        //20% maior
-    public static int nIteracoes;
     private int qtdeVarArificiais;
+    private int qtdeIteracoes;
 
     private PPL problema;                   //instancia de um problema de programação linear
     private PPL simplex;                    //tabelaSimplex
@@ -17,19 +17,25 @@ public class SimplexRevisado {
     private Matrix matriz;
     private double[] funcaoObjetivo;        //funcaoObjetivo atual
     private double[] colunaPivot;           //coluna do pivot
+    private double[] ladoDireito;           //lado direito do simplex
 
     public SimplexRevisado(PPL problema) {
-        qtdeVarArificiais = 0;
+        this.qtdeVarArificiais = 0;
+        this.qtdeIteracoes = 0;
         this.problema = problema;
-        nIteracoes = 0;
         if (problema.getQtdeRestricoes() > problema.getQtdeVariaveis() * FATOR_TOLERANCIA) {
-            //this.problema = problema.gerarDual();
+            this.problema = problema.gerarDual();
         }
         this.simplex = this.problema;
         //Etapa 01: construção da solução inicial viável
         this.insertVariaveisArtificiais();
         this.insereElementosDaMatriz();
         this.insereBase();
+        this.insereCoeficientesDaFuncaoObjetivo();
+        //Etapa 02: calcular a matriz inversa na iteração i
+        for (int i = 0; i < simplex.getNUMERO_MAXIMO_ITERACOES(); i++) {
+
+        }
     }
 
     //Etapa 01: construção da solução inicial viável
@@ -72,19 +78,56 @@ public class SimplexRevisado {
 
     private void insereBase() {
         //guardando os índices das variáveis da base inicial
-        for (int i = 0; i < simplex.getQtdeVariaveis() - qtdeVarArificiais; i++) {
+        int qtdeBase = simplex.getQtdeVariaveis() - qtdeVarArificiais;
+        base = new int[qtdeBase];
+        for (int i = 0; i < qtdeBase; i++) {
             base[i] = qtdeVarArificiais + i - 1;
         }
     }
 
     private void insereCoeficientesDaFuncaoObjetivo() {
+        //guardando os valores dos coeficientes da funcao objetivo inicial
+        funcaoObjetivo = new double[simplex.getQtdeVariaveis()];
         for (int i = 0; i < simplex.getQtdeVariaveis(); i++) {
-            
+            funcaoObjetivo[i] = simplex.getFuncaoObjetivo()[i];
         }
     }
 
-    //Etapa 02: calcular a inversa de B utilizando decomposição
+    private void insereLadoDireiro() {
+        //guardando os valores do lado direito iniciais
+        ladoDireito = new double[base.length];
+        for (int i = 0; i < base.length; i++) {
+            ladoDireito[i] = simplex.getQtdeVariaveis();
+        }
+    }
+
+    //Etapa 02: calcular a inversa na iteracao i
     private void calculaInversa() {
+        //encontra valor mais negativo
+        boolean hasNegativo = false;
+        double menor = 0.0;
+        int maisNegativo = -1;
+        for (int i = 0; i < simplex.getQtdeVariaveis(); i++) {
+            if (funcaoObjetivo[i] < 0.0) {
+                hasNegativo = true;
+                menor = funcaoObjetivo[i];
+                maisNegativo = i;
+            }
+        }
+        if (!hasNegativo) {     //se não houver valores negativos, chegou a solução ótima
+            printSucesso();
+        } else {
+            //terminar
+        }
+    }
+
+    private void printSucesso() {
+        System.out.println("=================================================================");
+        System.out.println("Solução viável encontrada após " + qtdeIteracoes + " iterações.\n");
+        int variaveisDoProblema = simplex.getQtdeVariaveis() - qtdeVarArificiais;
+        for (int i = 0; i < variaveisDoProblema; i++) {
+            System.out.print("X" + i + ": " + ladoDireito[i] + "\n");
+        }
     }
 
     private void insertFolga(double coeficiente, int i) {
